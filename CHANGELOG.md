@@ -6,7 +6,7 @@
 
 ### Изменено
 
-- Лицензия проекта изменена с MIT на Apache-2.0: обновлены файл `LICENSE` и поле `PackageLicenseExpression` в `Directory.Build.props`.
+- Лицензия проекта изменена с MIT на Apache-2.0: обновлены файл `LICENSE` и поле `PackageLicenseExpression` в `Directory.Build.props`. Выпущенные версии 0.2.0 и 0.3.0 остаются под MIT; Apache-2.0 действует с версии, в которой это изменение будет выпущено.
 
 ## [0.3.0] - 2026-10-18
 
