@@ -71,7 +71,9 @@ namespace PilotTestHost.Plugin
             TestRunReport report;
             try
             {
-                report = TestRunOrchestrator.Run(_services);
+                // Фильтр из окружения, как у CLI: позволяет запустить один сценарий в уже работающем клиенте
+                // (например, после смены пользователя без перезапуска).
+                report = TestRunOrchestrator.Run(_services, Environment.GetEnvironmentVariable(CliConstants.FilterVariable));
             }
             catch (Exception e)
             {

@@ -272,7 +272,9 @@ namespace PilotUITesting.Client
                 return null;
             }
 
-            return main.FindDescendantsBfs(element => element.SafeControlType() == ControlType.Window && element.SafeName() == WindowName, 3).FirstOrDefault();
+            // Правка строки клиент открывает и отдельным окном верхнего уровня, без владельца (ShowStandaloneDialog).
+            return main.FindDescendantsBfs(element => element.SafeControlType() == ControlType.Window && element.SafeName() == WindowName, 3).FirstOrDefault()
+                   ?? app.Windows.TryFind(By.Name(WindowName))?.Window;
         }
     }
 
