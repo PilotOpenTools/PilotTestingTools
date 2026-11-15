@@ -68,6 +68,6 @@ PilotUITesting, UI-тесты снаружи клиента:
 - Тестовые сборки загружаются через `Assembly.LoadFrom` в домен клиента: после пересборки тестов клиент нужно перезапустить.
 - Список непроверенного вживую для UI-тестов ведётся в [docs/pilot-ui-testing.md](docs/pilot-ui-testing.md).
 
-[Не выпущено]: https://github.com/mahach666/PilotTestingTools/compare/v0.3.0...HEAD
-[0.3.0]: https://github.com/mahach666/PilotTestingTools/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/mahach666/PilotTestingTools/releases/tag/v0.2.0
+[Не выпущено]: https://github.com/PilotOpenTools/PilotTestingTools/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/PilotOpenTools/PilotTestingTools/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/PilotOpenTools/PilotTestingTools/releases/tag/v0.2.0
