@@ -4,7 +4,7 @@
     <Version>0.3.0</Version>
     <Authors>mahach666</Authors>
     <Copyright>Copyright (c) 2026 mahach666</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/PilotOpenTools/PilotTestingTools</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PilotOpenTools/PilotTestingTools</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

@@ -4,6 +4,10 @@
 
 ## [Не выпущено]
 
+### Изменено
+
+- Лицензия проекта изменена с MIT на Apache-2.0: обновлены файл `LICENSE` и поле `PackageLicenseExpression` в `Directory.Build.props`.
+
 ## [0.3.0] - 2026-10-18
 
 ### Добавлено

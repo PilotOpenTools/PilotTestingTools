@@ -141,6 +141,10 @@ Debug-сборка `PilotTestHost.Plugin` дополнительно копир�
 
 Файлы релиза собирает `tools/pack-release.ps1`, по тегу `v*` их собирает и workflow на GitHub Actions. Порядок: [RELEASING.md](RELEASING.md). История изменений: [CHANGELOG.md](CHANGELOG.md).
 
+## Участие
+
+Правила участия: [CONTRIBUTING.md](https://github.com/PilotOpenTools/.github/blob/main/CONTRIBUTING.md). Кодекс поведения: [CODE_OF_CONDUCT.md](https://github.com/PilotOpenTools/.github/blob/main/CODE_OF_CONDUCT.md).
+
 ## Лицензия
 
-[MIT](LICENSE)
+Проект распространяется по лицензии [Apache 2.0](LICENSE).
