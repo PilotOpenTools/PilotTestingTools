@@ -1,6 +1,6 @@
 # PilotTestingTools
 
-[![CI](https://github.com/mahach666/PilotTestingTools/actions/workflows/ci.yml/badge.svg)](https://github.com/mahach666/PilotTestingTools/actions/workflows/ci.yml)
+[![CI](https://github.com/PilotOpenTools/PilotTestingTools/actions/workflows/ci.yml/badge.svg)](https://github.com/PilotOpenTools/PilotTestingTools/actions/workflows/ci.yml)
 
 Инструменты автоматического тестирования модулей Pilot-ICE Enterprise и Pilot-BIM. Две части, которые работают вместе или по отдельности.
 

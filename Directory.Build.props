@@ -5,8 +5,8 @@
     <Authors>mahach666</Authors>
     <Copyright>Copyright (c) 2026 mahach666</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/mahach666/PilotTestingTools</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/mahach666/PilotTestingTools</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/PilotOpenTools/PilotTestingTools</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PilotOpenTools/PilotTestingTools</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <!-- Пакетами становятся только проекты, которые сами ставят IsPackable=true -->
     <IsPackable>false</IsPackable>
