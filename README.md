@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/images/banner.png" alt="PilotTestingTools" width="720"></p>
+
 # PilotTestingTools
 
 [![CI](https://github.com/PilotOpenTools/PilotTestingTools/actions/workflows/ci.yml/badge.svg)](https://github.com/PilotOpenTools/PilotTestingTools/actions/workflows/ci.yml)
