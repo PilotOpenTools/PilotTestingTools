@@ -105,8 +105,8 @@ namespace PilotUITesting.Uia
 
         /// <summary>
         /// Выбрать в раскрывающемся списке пункт с точной подписью (текст пункта, иначе Name): раскрыть, найти пункт под списком или во
-        /// всплывающем окне, SelectionItem.Select (нет паттерна - клик мышью), проверить Value списка, если он есть. Возвращает подписи
-        /// всех пунктов этого открытия.
+        /// всплывающем окне, SelectionItem.Select (нет паттерна - клик мышью), проверить Value списка, если он есть, свернуть список,
+        /// если он остался раскрытым, и проверить, что значение не сбросилось. Возвращает подписи всех пунктов этого открытия.
         /// </summary>
         public static IReadOnlyList<string> Choose(Client.PilotApp app, AutomationElement combo, string itemCaption, string description)
         {

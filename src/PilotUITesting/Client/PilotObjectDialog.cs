@@ -102,7 +102,7 @@ namespace PilotUITesting.Client
 
         /// <summary>
         /// Заполнить атрибут: текстовое поле - через ValuePattern; поле со списком значений (ComboBox) - через вложенное поле ввода,
-        /// а если ввода нет - раскрыть список и выбрать пункт с таким текстом.
+        /// а если ввода нет - раскрыть список, выбрать пункт с таким текстом и свернуть список, если он остался раскрытым.
         /// </summary>
         public PilotObjectDialog SetField(string attributeName, string value)
         {
@@ -126,6 +126,11 @@ namespace PilotUITesting.Client
                           ?? _app.TopLevelWindows().Select(w => w.FindDescendantBfs(e => e.SafeControlType() == ControlType.ListItem && e.SafeName() == value, 8)).FirstOrDefault(e => e != null),
                     _timeout, $"значение '{value}' в списке поля '{attributeName}'");
                 item.SelectItem();
+                // SelectionItem.Select всплывающее окно не закрывает - следующий щелчок мышью только закрыл бы его
+                if (Wait.Retry(() => field.Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value) != ExpandCollapseState.Collapsed)
+                {
+                    Wait.Retry(() => field.Patterns.ExpandCollapse.Pattern.Collapse());
+                }
                 return this;
             }
             field.SetText(value);
