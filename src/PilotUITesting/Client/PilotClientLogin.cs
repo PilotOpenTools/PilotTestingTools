@@ -22,5 +22,15 @@ namespace PilotUITesting.Client
             ClientLoginFile.Save(config.ResolvedExePath, config.ProductFolder, config.ServerUrl, user, password);
             PilotLog.Action($"сохранён вход клиента {config.ProductFolder}: {user} в {config.ServerUrl}");
         }
+
+        /// <summary>Файл настроек клиента, в котором хранится сохранённый вход (для копии и возврата после тестов).</summary>
+        public static string SettingsPath(PilotUiConfig config)
+        {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+            return ClientLoginFile.SettingsPath(config.ProductFolder);
+        }
     }
 }

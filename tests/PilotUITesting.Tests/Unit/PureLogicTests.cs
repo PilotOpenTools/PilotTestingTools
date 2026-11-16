@@ -87,6 +87,20 @@ namespace PilotUITesting.Tests.Unit
         }
 
         [Test]
+        public void Empty_arrays_match_missing_value_as_server_stores_them()
+        {
+            Assert.That(PilotServerClient.SameAsStored(new int[0], new DValue()), Is.True, "пустой список оргединиц сервер хранит как null");
+            Assert.That(PilotServerClient.SameAsStored(new int[0], null), Is.True);
+            Assert.That(PilotServerClient.SameAsStored(new string[0], new DValue()), Is.True);
+            Assert.That(PilotServerClient.SameAsStored(null, new DValue()), Is.True, "атрибут убран");
+            Assert.That(PilotServerClient.SameAsStored(null, new[] { 1 }), Is.False);
+            Assert.That(PilotServerClient.SameAsStored(new int[0], new[] { 1103 }), Is.False);
+            Assert.That(PilotServerClient.SameAsStored(new[] { 1103 }, new[] { 1103 }), Is.True, "массивы сравниваются по элементам");
+            Assert.That(PilotServerClient.SameAsStored(new[] { 1103 }, new DValue()), Is.False);
+            Assert.That(PilotServerClient.SameAsStored("текст", "текст"), Is.True);
+        }
+
+        [Test]
         public void AttrOrNull_distinguishes_missing_from_empty()
         {
             DObject obj = new DObject();

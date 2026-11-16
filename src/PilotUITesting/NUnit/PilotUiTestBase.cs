@@ -40,6 +40,7 @@ namespace PilotUITesting.NUnit
         private readonly List<(string Description, Action Restore)> _afterTest = new List<(string, Action)>();
         private readonly List<(string Description, Action Restore)> _afterTests = new List<(string, Action)>();
         private string _clientRestartReason;
+        private LocalFileBackup _clientLogin;
         private PilotSandbox _testData;
         private PluginLogWatch _pluginLogs;
         private DateTime _testStartedUtc;
@@ -62,6 +63,14 @@ namespace PilotUITesting.NUnit
         /// <summary>Песочница тестовых данных класса (секция "sandbox" pilot-ui-tests.json): создаётся при первом обращении, убирается после всех тестов класса.</summary>
         protected PilotSandbox TestData => _testData ?? (_testData = PilotSandbox.Create(Server, Config.Sandbox, GetType().Name));
 
+        /// <summary>
+        /// Учётка из конфигурации (ключ "accounts"), под которой работает клиент в тестах класса; null - сохранённый вход клиента как есть.
+        /// Задана - перед запуском клиента работающий клиент закрывается (-quit), в настройки клиента записывается вход этой учётки
+        /// (<see cref="PilotClientLogin.Save"/>), подпись профиля сверяется с её clientUser; после всех тестов класса клиент закрывается
+        /// и прежний сохранённый вход возвращается. Учётки нет - тесты класса пропускаются (Assert.Ignore).
+        /// </summary>
+        protected virtual string ClientAccount => null;
+
         /// <summary>Перед каждым тестом закрывать меню и окна, оставшиеся от упавшего теста (по умолчанию - ключ resetUiBeforeEachTest).</summary>
         protected virtual bool ResetUiBeforeEachTest => Config.ResetUiBeforeEachTest;
 
@@ -82,6 +91,10 @@ namespace PilotUITesting.NUnit
             }
             Server = PilotServerClient.Connect(Config.ServerUrl, Config.ResolvedApiLogin, Config.ResolvedApiPassword);
             Server.DefaultDataTimeout = Config.DataTimeout;
+            if (!string.IsNullOrWhiteSpace(ClientAccount))
+            {
+                LoginClientAs(ClientAccount);
+            }
             App = PilotApp.StartOrAttach(Config);
             _pluginLogs = new PluginLogWatch(PluginLogWatch.DefaultDirectory(Config.Client), Config.PluginLogs ?? new string[0]);
             TestArtifacts.Prune(Config);
@@ -98,7 +111,21 @@ namespace PilotUITesting.NUnit
                 Try(OnAfterTests, errors);
             }
             RunRestores(_afterTests, errors);
-            if (App != null)
+            if (_clientLogin != null)
+            {
+                // клиент под учёткой класса: закрыть (и не подключённый - запуск мог упасть после старта процесса), чтобы следующий
+                // класс не подключился к нему и клиент при выходе не перезаписал возвращаемый вход
+                if (App != null)
+                {
+                    Try(() => CloseViews(TabLifetime.Fixture), errors);
+                    Try(() => App.Quit(), errors);
+                }
+                else
+                {
+                    Try(() => PilotApp.QuitRunning(Config), errors);
+                }
+            }
+            else if (App != null)
             {
                 Try(() => CloseViews(TabLifetime.Fixture), errors);
                 if (NeedsRestart(out string _))
@@ -114,6 +141,18 @@ namespace PilotUITesting.NUnit
             foreach (LocalFileBackup backup in _files)
             {
                 Try(backup.Restore, errors);
+            }
+            if (_clientLogin != null)
+            {
+                LocalFileBackup login = _clientLogin;
+                _clientLogin = null;
+                Try(login.Restore, errors);
+                if (PilotApp.IsRunning(Config))
+                {
+                    // клиент перезаписывает настройки при выходе - возвращённый вход пропадёт
+                    errors.Add(new InvalidOperationException($"Клиент под учёткой «{ClientAccount}» не закрылся: прежний сохранённый вход возвращён, "
+                        + "но при выходе клиент перезапишет его входом учётки. Закройте клиент и проверьте вход: " + PilotClientLogin.SettingsPath(Config)));
+                }
             }
             if (_testData != null)
             {
@@ -284,15 +323,32 @@ namespace PilotUITesting.NUnit
             {
                 return existing;
             }
-            if (!Config.Accounts.TryGetValue(accountName, out PilotAccount account) || account == null || string.IsNullOrWhiteSpace(account.Login) || string.IsNullOrEmpty(account.Password))
-            {
-                Assert.Ignore($"Нужна учётка «{accountName}»: ключ accounts в pilot-ui-tests.local.json или PILOT_UI_ACCOUNT_{accountName.ToUpperInvariant()}_LOGIN/_PASSWORD.");
-            }
+            PilotAccount account = RequireAccount(accountName);
             PilotServerClient client = PilotServerClient.Connect(Config.ServerUrl, account.Login, account.Password);
             client.DefaultDataTimeout = Config.DataTimeout;
             _accounts[accountName] = client;
             PilotLog.Action($"Server API под учёткой «{accountName}» ({account.Login})");
             return client;
+        }
+
+        private PilotAccount RequireAccount(string accountName)
+        {
+            if (!Config.Accounts.TryGetValue(accountName, out PilotAccount account) || account == null || string.IsNullOrWhiteSpace(account.Login) || string.IsNullOrEmpty(account.Password))
+            {
+                Assert.Ignore($"Нужна учётка «{accountName}»: ключ accounts в pilot-ui-tests.local.json или PILOT_UI_ACCOUNT_{accountName.ToUpperInvariant()}_LOGIN/_PASSWORD.");
+            }
+            return account;
+        }
+
+        /// <summary>Клиент под учёткой класса (<see cref="ClientAccount"/>): закрыть работающий, записать вход, сверять её подпись профиля.</summary>
+        private void LoginClientAs(string accountName)
+        {
+            PilotAccount account = RequireAccount(accountName);
+            PilotApp.QuitRunning(Config);
+            _clientLogin = LocalFileBackup.Take(PilotClientLogin.SettingsPath(Config));
+            PilotClientLogin.Save(Config, account.Login, account.Password);
+            Config.ClientUser = string.IsNullOrWhiteSpace(account.ClientUser) ? null : account.ClientUser;
+            PilotLog.Action($"клиент в тестах класса - под учёткой «{accountName}» ({account.Login})");
         }
 
         /// <summary>

@@ -65,6 +65,20 @@ namespace PilotUITesting.Tests.Unit
         }
 
         [Test]
+        public void Account_client_user_is_read_for_client_under_account()
+        {
+            File.WriteAllText(Path.Combine(_dir, PilotUiConfig.FileName), @"{
+  ""serverUrl"": ""http://host/db"", ""clientUser"": ""bot (Инженер)"",
+  ""accounts"": { ""worker"": { ""login"": ""w1"", ""password"": ""p1"", ""clientUser"": ""w1 (Сотрудник)"" }, ""plain"": { ""login"": ""x"", ""password"": ""y"" } }
+}");
+            PilotUiConfig config = PilotUiConfig.Load(_dir);
+            Assert.That(config.UnknownKeys, Is.Empty, "clientUser учётки - известный ключ");
+            Assert.That(config.Accounts["worker"].ClientUser, Is.EqualTo("w1 (Сотрудник)"));
+            Assert.That(config.Accounts["plain"].ClientUser, Is.Null, "без clientUser подпись не сверяется");
+            Assert.That(config.ClientUser, Is.EqualTo("bot (Инженер)"), "общая подпись клиента не меняется");
+        }
+
+        [Test]
         public void Admin_login_without_password_is_a_problem()
         {
             File.WriteAllText(Path.Combine(_dir, PilotUiConfig.FileName), @"{ ""serverUrl"": ""http://host/db"", ""adminLogin"": ""root"" }");

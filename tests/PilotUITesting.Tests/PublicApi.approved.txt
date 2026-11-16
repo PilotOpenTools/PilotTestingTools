@@ -41,6 +41,8 @@ PilotUITesting.Client.PilotApp | method Dispose() : System.Void
 PilotUITesting.Client.PilotApp | static method EnableDpiAwareness() : PilotUITesting.Uia.DpiStatus
 PilotUITesting.Client.PilotApp | method ShowObject(System.Guid objectId, System.Guid? annotationId = null, System.TimeSpan? timeout = null) : System.Void
 PilotUITesting.Client.PilotApp | method Quit(System.TimeSpan? timeout = null) : System.Void
+PilotUITesting.Client.PilotApp | static method QuitRunning(PilotUITesting.PilotUiConfig config, System.TimeSpan? timeout = null) : System.Void
+PilotUITesting.Client.PilotApp | static method IsRunning(PilotUITesting.PilotUiConfig config) : System.Boolean
 PilotUITesting.Client.PilotApp | method Restart() : PilotUITesting.Client.PilotApp
 PilotUITesting.Client.PilotApp | method BringToFront() : System.Void
 PilotUITesting.Client.PilotApp | method SendKeys(System.String description, params FlaUI.Core.WindowsAPI.VirtualKeyShort[] keys) : System.Void
@@ -84,8 +86,15 @@ PilotUITesting.Client.PilotCard | method AddOrgUnit(System.String stage, System.
 PilotUITesting.Client.PilotCard | method OrgUnits(System.String stage) : System.Collections.Generic.IReadOnlyList<System.String>
 PilotUITesting.Client.PilotCard | method Describe() : System.String
 PilotUITesting.Client.PilotCard | method ToString() : System.String
+PilotUITesting.Client.PilotChat | class
+PilotUITesting.Client.PilotChat | method Messages() : System.Collections.Generic.IReadOnlyList<System.String>
+PilotUITesting.Client.PilotChat | method WaitMessage(System.String text, System.TimeSpan? timeout = null) : FlaUI.Core.AutomationElements.AutomationElement
+PilotUITesting.Client.PilotChat | method Send(System.String text, System.TimeSpan? timeout = null) : FlaUI.Core.AutomationElements.AutomationElement
+PilotUITesting.Client.PilotChat | method ClickLink(System.String address, System.TimeSpan? timeout = null) : System.Void
+PilotUITesting.Client.PilotChat | property Root : FlaUI.Core.AutomationElements.AutomationElement { get; }
 PilotUITesting.Client.PilotClientLogin | static class
 PilotUITesting.Client.PilotClientLogin | static method Save(PilotUITesting.PilotUiConfig config, System.String user, System.String password) : System.Void
+PilotUITesting.Client.PilotClientLogin | static method SettingsPath(PilotUITesting.PilotUiConfig config) : System.String
 PilotUITesting.Client.PilotCommonSettingsWindow | class : PilotUITesting.Client.PilotDialog
 PilotUITesting.Client.PilotCommonSettingsWindow | static method AddItemId(System.String featureKey) : System.String
 PilotUITesting.Client.PilotCommonSettingsWindow | static method Open(PilotUITesting.Client.PilotApp app, System.TimeSpan? timeout = null) : PilotUITesting.Client.PilotCommonSettingsWindow
@@ -93,6 +102,7 @@ PilotUITesting.Client.PilotCommonSettingsWindow | static method Wait(PilotUITest
 PilotUITesting.Client.PilotCommonSettingsWindow | static method TryFind(PilotUITesting.Client.PilotApp app) : PilotUITesting.Client.PilotCommonSettingsWindow
 PilotUITesting.Client.PilotCommonSettingsWindow | method Groups() : System.Collections.Generic.IReadOnlyList<System.String>
 PilotUITesting.Client.PilotCommonSettingsWindow | method Rows() : System.Collections.Generic.IReadOnlyList<FlaUI.Core.AutomationElements.AutomationElement>
+PilotUITesting.Client.PilotCommonSettingsWindow | method FeatureRows(System.String featureKey) : System.Collections.Generic.IReadOnlyList<FlaUI.Core.AutomationElements.AutomationElement>
 PilotUITesting.Client.PilotCommonSettingsWindow | method TryFindRow(System.String textPart) : FlaUI.Core.AutomationElements.AutomationElement
 PilotUITesting.Client.PilotCommonSettingsWindow | method EditRow(FlaUI.Core.AutomationElements.AutomationElement row, System.TimeSpan? timeout = null) : PilotUITesting.Client.PilotNewSettingsItemWindow
 PilotUITesting.Client.PilotCommonSettingsWindow | method RemoveRow(System.String textPart, System.TimeSpan? timeout = null) : System.Void
@@ -238,6 +248,15 @@ PilotUITesting.Client.PilotIds+Card+ReferenceBook | const field CheckBox : Syste
 PilotUITesting.Client.PilotIds+Card+ReferenceBook | const field ItemTitle : System.String = "titleTextBlock"
 PilotUITesting.Client.PilotIds+Card+ReferenceBook | const field Ok : System.String = "btnOk"
 PilotUITesting.Client.PilotIds+Card+ReferenceBook | const field Cancel : System.String = "btnCancel"
+PilotUITesting.Client.PilotIds+Chat | static class
+PilotUITesting.Client.PilotIds+Chat | const field Container : System.String = "AUIDChatView"
+PilotUITesting.Client.PilotIds+Chat | const field Messages : System.String = "messagesListControl"
+PilotUITesting.Client.PilotIds+Chat | const field MessageText : System.String = "messageText"
+PilotUITesting.Client.PilotIds+Chat | const field MessageAuthor : System.String = "authorTextBlock"
+PilotUITesting.Client.PilotIds+Chat | const field SystemMessage : System.String = "chatSystemTextBlock"
+PilotUITesting.Client.PilotIds+Chat | const field NewMessage : System.String = "newMessageTextBox"
+PilotUITesting.Client.PilotIds+Chat | const field Send : System.String = "sendButton"
+PilotUITesting.Client.PilotIds+Chat | const field AddAttachment : System.String = "addAttachmentButton"
 PilotUITesting.Client.PilotIds+DialogWindow | static class
 PilotUITesting.Client.PilotIds+DialogWindow | const field Minimize : System.String = "btnMinimize"
 PilotUITesting.Client.PilotIds+DialogWindow | const field Restore : System.String = "btnRestore"
@@ -1006,6 +1025,7 @@ PilotUITesting.Client.PilotPage | method ToolbarWith(System.String anyButtonId) 
 PilotUITesting.Client.PilotPage | method CardIn(System.String containerId) : PilotUITesting.Client.PilotCard
 PilotUITesting.Client.PilotPage | method ListById(System.String listId, System.Func<FlaUI.Core.AutomationElements.AutomationElement, System.String> rowTitle = null) : PilotUITesting.Client.PilotList
 PilotUITesting.Client.PilotPage | method ListBy(PilotUITesting.Uia.By selector, System.Func<FlaUI.Core.AutomationElements.AutomationElement, System.String> rowTitle = null) : PilotUITesting.Client.PilotList
+PilotUITesting.Client.PilotPage | method Chat() : PilotUITesting.Client.PilotChat
 PilotUITesting.Client.PilotPage | method GridById(System.String gridId) : PilotUITesting.Uia.UiGrid
 PilotUITesting.Client.PilotPage | method Dump(System.Int32 maxDepth = 40) : System.String
 PilotUITesting.Client.PilotPage | method ToString() : System.String
@@ -1257,6 +1277,8 @@ PilotUITesting.Data.PilotServerClient | method ActualSnapshotCreated(System.Guid
 PilotUITesting.Data.PilotServerClient | method ReloadMetadata() : System.Void
 PilotUITesting.Data.PilotServerClient | static method AttrOrNull(Ascon.Pilot.DataClasses.DObject obj, System.String name) : System.String
 PilotUITesting.Data.PilotServerClient | method StateIdByName(System.String name) : System.Guid
+PilotUITesting.Data.PilotServerClient | method GetCommonSetting(System.String key, System.Int32 orgUnitId = 0) : System.String
+PilotUITesting.Data.PilotServerClient | method SetCommonSetting(System.String key, System.String value, System.Int32 orgUnitId = 0, System.TimeSpan? timeout = null) : System.Void
 PilotUITesting.Data.PilotServerClient | property ReconnectCount : System.Int32 { get; }
 PilotUITesting.Data.PilotServerClient | property Metadata : Ascon.Pilot.DataClasses.DMetadata { get; }
 PilotUITesting.Data.PilotServerClient | property DatabaseInfo : Ascon.Pilot.DataClasses.DDatabaseInfo { get; }
@@ -1266,6 +1288,7 @@ PilotUITesting.Data.PilotServerClient | property DefaultDataTimeout : System.Tim
 PilotUITesting.Data.PilotServerClient | property Storage : Ascon.Pilot.DataModifier.FileSystemStorageProvider { get; }
 PilotUITesting.Data.PilotServerClient | property Errors : System.Collections.Generic.IReadOnlyList<PilotUITesting.Data.ServerError> { get; }
 PilotUITesting.Data.PilotServerClient | static readonly field RootId : System.Guid
+PilotUITesting.Data.PilotServerClient | const field WholeDatabase : System.Int32 = 0
 PilotUITesting.Data.PilotTestFiles | static class
 PilotUITesting.Data.PilotTestFiles | static method Pdf(System.String text, System.String fileName = null) : System.String
 PilotUITesting.Data.PilotTestFiles | static method MinimalPdf(System.String text) : System.Byte[]
@@ -1325,6 +1348,7 @@ PilotUITesting.NUnit.PilotUiTestBase | protected property ModuleButtonTitle : Sy
 PilotUITesting.NUnit.PilotUiTestBase | protected property Timeout : System.TimeSpan { get; }
 PilotUITesting.NUnit.PilotUiTestBase | protected property DataTimeout : System.TimeSpan { get; }
 PilotUITesting.NUnit.PilotUiTestBase | protected property TestData : PilotUITesting.Data.PilotSandbox { get; }
+PilotUITesting.NUnit.PilotUiTestBase | protected property ClientAccount : System.String { get; }
 PilotUITesting.NUnit.PilotUiTestBase | protected property ResetUiBeforeEachTest : System.Boolean { get; }
 PilotUITesting.NUnit.PilotUiTestBase | protected property DialogCancelButtonIds : System.String[] { get; }
 PilotUITesting.NUnit.TabLifetime | enum
@@ -1342,6 +1366,7 @@ PilotUITesting.PilotAccount | class
 PilotUITesting.PilotAccount | ctor()
 PilotUITesting.PilotAccount | property Login : System.String { get; set; }
 PilotUITesting.PilotAccount | property Password : System.String { get; set; }
+PilotUITesting.PilotAccount | property ClientUser : System.String { get; set; }
 PilotUITesting.PilotClientKind | enum
 PilotUITesting.PilotClientKind | enum PilotIce = 0
 PilotUITesting.PilotClientKind | enum PilotBim = 1

@@ -78,15 +78,17 @@ public class MyModuleTests : PilotUiTestBase
 | `PilotToolbar` | панель команд | кнопка по id = имя из построителя (и у модулей), `IsEnabled/IsChecked/IsHidden` из ItemStatus, меню кнопки `<id>ContextMenu`, скрытые кнопки через «…» |
 | `PilotMenu` | меню | контекстное (клавиша «Меню» или правый клик), кнопки панели, главное; `Click("id", "id подпункта")`, `ClickText(...)`, `Items()` |
 | `PilotCard` | карточка атрибутов | в любом окне и области: `Set`, `Choose`, `SetDate`, `PickReference`, `AddOrgUnit`, `ObligatoryAttributes` - с проверкой введённого; в справочнике уже отмеченная строка не нажимается повторно (клик снял бы отметку), выбор без изменений закрывается «Отменой» (`PilotReferenceBook.Submit`) |
+| `PilotChat` | `page.Chat()` | панель чата Pilot в области страницы (вкладка «Чаты», чат объекта, чат в представлении модуля): `Send(текст)` с ожиданием сообщения в ленте, `Messages()`, `WaitMessage(текст)`, `ClickLink(адрес)` - щелчок мышью в первую строку ссылки в сообщении |
 | `UiGrid` | таблица | `RowCount`, `Columns()`, `Cell(строка, колонка)`, `FindRow`, `SelectRow` (FieldName или подпись колонки) |
 | `PilotMessageBox`, `PilotErrorWindow`, `WindowsFileDialog` | стандартные окна | `Answer(Yes/No/Cancel/Ok)` по фактическому набору кнопок; текст ошибки; открыть файл |
 | `By`, `Wait`, `UiActions` | ядро | селекторы; ожидания `Wait.Until(() => …)` без таймаута (описание - из текста условия), `Wait.Stays`; действия над найденным элементом для page object'ов модулей |
-| `PilotServerClient` | `Server` | прежнее + `…AndWait` (подтверждение чтением и мгновенный отказ, если сервер отклонил изменение), `DeletePermanently`, `WaitDescendant`, `TaskAttachments`, `Errors` |
+| `PilotServerClient` | `Server` | прежнее + `…AndWait` (подтверждение чтением и мгновенный отказ, если сервер отклонил изменение), `DeletePermanently`, `WaitDescendant`, `TaskAttachments`, `Errors`, общие настройки `GetCommonSetting/SetCommonSetting(ключ, значение, оргединица)` (нужен администратор базы) |
 | `PilotSandbox` | `TestData` | корень «{префикс} {класс} {время}» в корне базы, `CreateFolder/CreateDocument/Create`, `Unique(...)`, `Track(id)`; после класса удаляет окончательно и проверяет: поддерево корня, объекты из `Track` с их поддеревьями и объекты, которые тест удалил из песочницы в корзину (находятся по наборам изменений прогона и атрибуту `Delete_source`). Объект старше песочницы и его предки не удаляются (сервер удалил бы его вместе с родителем) - это отчёт об ошибке уборки. Удалённое в корзину через интерфейс под другим пользователем уборка видит, только если учётка Server API - администратор (иначе - предупреждение) |
 
 Базовый класс `PilotUiTestBase` дополнительно даёт `Step(...)` (журнал шагов), `RequireTypes(...)`, `OpenExplorer(...)`, `Track(...)`
 (вкладка или представление модуля закроется после теста/класса), `RestoreFileAfterTests(путь)`, `AssertNoPilotErrors()`,
-`AssertNoPluginErrors()`, `NewOutputPath(имя)`.
+`AssertNoPluginErrors()`, `NewOutputPath(имя)`, `ServerAs(учётка)` (Server API под другим пользователем) и `ClientAccount`
+(клиент в тестах класса под другим пользователем, см. «Клиент под другим пользователем»).
 
 ## Каталог идентификаторов
 
@@ -134,6 +136,24 @@ public class MyModuleTests : PilotUiTestBase
 ```csharp
 PilotClientLogin.Save(PilotUiConfig.Load(), "bot", password); // exe, клиент и serverUrl - из конфигурации
 ```
+
+### Клиент под другим пользователем
+
+Класс тестов, которому нужен клиент под другим пользователем (например, без прав администратора), переопределяет `ClientAccount` -
+имя учётки из ключа `accounts`:
+
+```csharp
+protected override string ClientAccount => "worker";
+```
+
+```json
+"accounts": { "worker": { "login": "ui_worker", "password": "…", "clientUser": "ui_worker (Сотрудник)" } }
+```
+
+Перед запуском клиента работающий клиент закрывается (`PilotApp.QuitRunning`, «-quit»), в настройки записывается вход учётки, а подпись
+кнопки профиля сверяется с её `clientUser` (вместо общего `clientUser`). После всех тестов класса клиент закрывается и прежний сохранённый
+вход возвращается побайтно - следующий класс запускает клиент под своим пользователем. Учётки нет - тесты класса пропускаются.
+Пароль учётки, как и другие, лучше держать в `pilot-ui-tests.local.json` или `PILOT_UI_ACCOUNT_<ИМЯ>_LOGIN/_PASSWORD`.
 
 `StartOrAttach` не ждёт `clientStartTimeoutSeconds`, если клиент не войдёт: сразу бросает исключение с причиной, когда процесс клиента
 завершился, когда у клиента нет сохранённого входа (`ConnectionState:NoSettings`, «Необходимо настроить соединение») и когда

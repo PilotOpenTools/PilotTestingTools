@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
@@ -90,9 +92,43 @@ namespace PilotUITesting.Client
             // журнал - с текущего конца, до запуска: в нём ищется причина, по которой клиент не вошёл в базу
             ClientLogFile log = ClientLogFile.FromNow(ClientLogPath(config));
             Process process = Process.Start(new ProcessStartInfo(config.ResolvedExePath) { UseShellExecute = true });
+            WaitProcessLoaded(config, process);
             PilotApp app = new PilotApp(config, process, true, log);
             app.WaitMainWindow();
             return app;
+        }
+
+        /// <summary>
+        /// Дождаться, пока у только что запущенного процесса появится главный модуль: FlaUI Application.Attach читает
+        /// Process.MainModule, а сразу после запуска его ещё нет (NullReferenceException в ProcessModule.FileName).
+        /// </summary>
+        private static void WaitProcessLoaded(PilotUiConfig config, Process process)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+            while (true)
+            {
+                if (process.HasExited)
+                {
+                    throw new InvalidOperationException($"Процесс клиента завершился сразу после запуска (код {process.ExitCode}). Причина - в журнале клиента: {ClientLogPath(config)}");
+                }
+                try
+                {
+                    process.Refresh();
+                    if (!string.IsNullOrEmpty(process.MainModule?.FileName))
+                    {
+                        return;
+                    }
+                }
+                catch (Exception e) when (e is Win32Exception || e is InvalidOperationException || e is NullReferenceException)
+                {
+                    // модули процесса ещё не загружены - читаем снова до таймаута
+                }
+                if (sw.Elapsed >= config.ClientStartTimeout)
+                {
+                    throw new PilotWaitTimeoutException("загрузка процесса клиента (главный модуль)", config.ClientStartTimeout, sw.Elapsed, null, null);
+                }
+                Thread.Sleep(100);
+            }
         }
 
         private static string ClientLogPath(PilotUiConfig config)

@@ -242,6 +242,12 @@ namespace PilotUITesting.Client
             return new PilotList(App, () => TryFind(selector), "список " + selector + " в «" + Description + "»", rowTitle);
         }
 
+        /// <summary>Панель чата Pilot в этой области (вкладка «Чаты», чат объекта в окне или в представлении модуля).</summary>
+        public PilotChat Chat()
+        {
+            return new PilotChat(ResolveRoot, "«" + Description + "»");
+        }
+
         /// <summary>Таблица (GridPattern; проверено на DevExpress GridControl 20.1).</summary>
         public UiGrid GridById(string gridId)
         {
