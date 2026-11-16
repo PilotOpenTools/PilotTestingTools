@@ -2,7 +2,7 @@
 
 Библиотека для сквозных UI-тестов модулей Pilot-ICE Enterprise / Pilot-BIM: тесты запускают (или подхватывают) настоящий клиент Pilot,
 прокликивают интерфейс через UI Automation (FlaUI) как пользователь и проверяют результат в базе через Ascon.Pilot.Server.Api.
-Дополняет [PilotTestHost](pilot-test-host.md): тот выполняет тесты внутри процесса клиента на уровне SDK, а эта библиотека работает снаружи.
+Дополняет [PilotTestHost](https://github.com/PilotOpenTools/PilotTestingTools/blob/main/docs/pilot-test-host.md): тот выполняет тесты внутри процесса клиента на уровне SDK, а эта библиотека работает снаружи.
 
 В библиотеке уже заготовлено то, что раньше каждый проект тестов писал сам:
 
@@ -22,7 +22,7 @@
 |--------|-----------|
 | `src/PilotUITesting` | библиотека (net48; FlaUI.UIA3 5.0, Ascon.Pilot.Server.Api 26.1, NUnit 4.3) |
 | `tests/PilotUITesting.Tests` | модульные тесты библиотеки (без клиента Pilot) и снимок публичного API |
-| `tools/PilotUITesting.Inspector` | консольный инспектор: подробный дамп дерева UI Automation окон клиента, клики, ввод |
+| `tools/PilotUITesting.Inspector` | консольный инспектор: дамп дерева UI Automation окон процесса и снимки экрана, запуск процесса, клики, выбор строки, ввод текста и клавиш, закрытие модальных окон (команды ниже, раздел «Инспектор») |
 
 ## Быстрый старт
 
@@ -129,7 +129,7 @@ public class MyModuleTests : PilotUiTestBase
 ### Сохранённый вход клиента
 
 Клиент входит в базу сам, по сохранённому входу. Сохранить его можно при закрытом клиенте: `pilottest --login <сервер> <пользователь> <пароль>`
-(см. [pilot-test-host.md](pilot-test-host.md)) или из кода, например в `[SetUpFixture]` до запуска клиента:
+(см. [pilot-test-host.md](https://github.com/PilotOpenTools/PilotTestingTools/blob/main/docs/pilot-test-host.md)) или из кода, например в `[SetUpFixture]` до запуска клиента:
 
 ```csharp
 PilotClientLogin.Save(PilotUiConfig.Load(), "bot", password); // exe, клиент и serverUrl - из конфигурации
@@ -203,6 +203,7 @@ dotnet test tests\PilotUITesting.Tests\PilotUITesting.Tests.csproj
 
 ```
 PilotUITesting.Inspector dump  [процесс=Ascon.Pilot.PilotBIM] [папка] [глубина]
+PilotUITesting.Inspector shot  [процесс=Ascon.Pilot.PilotBIM] [папка]
 PilotUITesting.Inspector start "C:\Program Files\ASCON\Pilot-BIM\Ascon.Pilot.PilotBIM.exe" [папка]
 PilotUITesting.Inspector click Ascon.Pilot.PilotEnterprise "id=AddTabButton|name=Кнопка|text=часть" [папка] [ждать мс]
 PilotUITesting.Inspector row   Ascon.Pilot.PilotEnterprise "текст строки" [папка]
@@ -210,6 +211,8 @@ PilotUITesting.Inspector type  Ascon.Pilot.PilotEnterprise "id=AUIDname" "тек
 PilotUITesting.Inspector keys  Ascon.Pilot.PilotEnterprise "{ESC}" [папка]
 PilotUITesting.Inspector cancel Ascon.Pilot.PilotEnterprise [папка] [id1,id2]
 ```
+
+`dump` сохраняет дерево и снимок окон процесса, `shot` только снимки, `start` запускает процесс и через 15 с делает дамп, `click`, `row`, `type`, `keys` и `cancel` выполняют действие и затем делают дамп. `keys` отправляет клавиши в активное окно (имя процесса нужно только для дампа после нажатия). Без папки результат пишется в `%TEMP%\PilotUITesting`.
 
 Инспектор включает осведомлённость о DPI, дамп подробный (класс, прямоугольник, HelpText, ItemStatus, ItemType, значение, паттерны).
 

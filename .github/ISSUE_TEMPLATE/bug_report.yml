@@ -1,0 +1,49 @@
+name: Сообщение об ошибке
+description: Что-то работает не так, как ожидалось
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Что произошло
+      description: Опишите проблему.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ожидаемый результат
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Версия проекта
+      placeholder: например, 1.2.3
+    validations:
+      required: true
+  - type: input
+    id: pilot
+    attributes:
+      label: Версия и продукт Pilot
+      placeholder: например, Pilot-ICE Enterprise 26.x
+  - type: input
+    id: env
+    attributes:
+      label: Окружение
+      placeholder: Windows, .NET и другое, что важно
+  - type: textarea
+    id: logs
+    attributes:
+      label: Логи и сообщения об ошибках
+      description: Уберите пароли, ключи и данные клиентов.
+      render: text

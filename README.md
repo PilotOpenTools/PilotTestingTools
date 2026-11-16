@@ -1,6 +1,8 @@
+<p align="center"><img src="docs/images/banner.png" alt="PilotTestingTools" width="720"></p>
+
 # PilotTestingTools
 
-[![CI](https://github.com/mahach666/PilotTestingTools/actions/workflows/ci.yml/badge.svg)](https://github.com/mahach666/PilotTestingTools/actions/workflows/ci.yml)
+[![CI](https://github.com/PilotOpenTools/PilotTestingTools/actions/workflows/ci.yml/badge.svg)](https://github.com/PilotOpenTools/PilotTestingTools/actions/workflows/ci.yml)
 
 Инструменты автоматического тестирования модулей Pilot-ICE Enterprise и Pilot-BIM. Две части, которые работают вместе или по отдельности.
 
@@ -8,7 +10,7 @@
 
 **PilotUITesting** управляет настоящим клиентом снаружи через UI Automation, как пользователь, и проверяет результат в базе через Server API. Библиотека не ссылается на Pilot SDK и использует только Server API.
 
-Версия 0.3.0, ранняя. Публичный API может измениться до 1.0.
+Версия 0.4.0, ранняя. Публичный API может измениться до 1.0.
 
 ## Зачем
 
@@ -59,6 +61,22 @@ UI-тесты проверялись вживую на Pilot-ICE Enterprise. Д�
 | `PilotUITesting-Inspector-<версия>.zip` | инспектор дерева UI Automation |
 | `SHA256SUMS.txt` | контрольные суммы всех файлов |
 
+Консольный запуск из архива: распакуйте `PilotTestHost-Cli-<версия>.zip` в любую папку (нужен .NET 8 Runtime), `pilottest.exe` лежит в корне. Плагин-хост из `PilotTestHost-Plugin-<версия>.zip` должен быть установлен, тестовые сборки лежат в его подпапке `Tests\`, у клиента сохранён вход (см. «Быстрый старт»).
+
+```powershell
+.\pilottest.exe --filter "MyPlugin.Tests.*" --output report.json
+```
+
+Без `--client` ищется `C:\Program Files\ASCON\Pilot-ICE Enterprise\Ascon.Pilot.PilotEnterprise.exe`, затем `C:\Program Files\ASCON\Pilot-BIM\Ascon.Pilot.PilotBIM.exe`; другой путь задаётся `--client <exe>`. Список аргументов: `pilottest.exe --help`.
+
+Инспектор: в `PilotUITesting-Inspector-<версия>.zip` лежит `PilotUITesting.Inspector.exe` (.NET Framework 4.8) с зависимостями. Он подключается к запущенному клиенту по имени процесса (команда `start` запускает процесс сама) и сохраняет дерево UI Automation и снимок экрана в `%TEMP%\PilotUITesting`. Команды `dump`, `shot`, `start`, `click`, `row`, `type`, `keys`, `cancel`:
+
+```powershell
+.\PilotUITesting.Inspector.exe dump Ascon.Pilot.PilotEnterprise
+```
+
+Подробнее: [docs/pilot-ui-testing.md](docs/pilot-ui-testing.md#инспектор).
+
 ## Быстрый старт
 
 ### Тесты внутри клиента
@@ -66,7 +84,7 @@ UI-тесты проверялись вживую на Pilot-ICE Enterprise. Д�
 Тестовый проект ссылается на `PilotTestHost.Sdk` без копирования сборки в выходную папку: сборку SDK деплоит плагин-хост, обе стороны должны использовать один экземпляр.
 
 ```xml
-<PackageReference Include="PilotTestHost.Sdk" Version="0.3.0" ExcludeAssets="runtime" />
+<PackageReference Include="PilotTestHost.Sdk" Version="0.4.0" ExcludeAssets="runtime" />
 ```
 
 ```csharp
@@ -100,7 +118,7 @@ pilottest --filter "MyPlugin.Tests.*" --output report.json
 {
   "client": "PilotIce",                         // PilotIce | PilotBim
   "serverUrl": "http://host:5545/database",     // сервер и база
-  "clientUser": "bot (bot)",                    // под кем вошёл клиент (сверяется)
+  "clientUser": "bot (Инженер)",                // под кем вошёл клиент: подпись кнопки профиля (сверяется)
   "dpiAware": true,
   "resetUiBeforeEachTest": true
 }
@@ -139,8 +157,12 @@ Debug-сборка `PilotTestHost.Plugin` дополнительно копир�
 
 ## Выпуск
 
-Файлы релиза собирает `tools/pack-release.ps1`, по тегу `v*` их собирает и workflow на GitHub Actions. Порядок: [RELEASING.md](RELEASING.md). История изменений: [CHANGELOG.md](CHANGELOG.md).
+Файлы релиза собирает `tools/pack-release.ps1`, по тегу `v*` их собирает и workflow на GitHub Actions: он же создаёт черновик релиза с пометкой pre-release и публикует пакеты в nuget.org. Порядок: [RELEASING.md](RELEASING.md). История изменений: [CHANGELOG.md](CHANGELOG.md).
+
+## Участие
+
+Правила участия: [CONTRIBUTING.md](https://github.com/PilotOpenTools/.github/blob/main/CONTRIBUTING.md). Кодекс поведения: [CODE_OF_CONDUCT.md](https://github.com/PilotOpenTools/.github/blob/main/CODE_OF_CONDUCT.md).
 
 ## Лицензия
 
-[MIT](LICENSE)
+Проект распространяется по лицензии [Apache 2.0](LICENSE). Версии 0.2.0 и 0.3.0 (пакеты NuGet и исходники по тегам) выпущены под MIT и остаются под ней; Apache-2.0 действует с версии 0.4.0 ([CHANGELOG.md](CHANGELOG.md)).

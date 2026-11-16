@@ -8,6 +8,17 @@
 
 - `Choose` (`PilotPage`, `PilotCard`, `UiActions`) оставлял список раскрытым после выбора через SelectionItem, и следующий щелчок мышью только закрывал список. Теперь список сворачивается, и проверяется, что выбранное значение осталось. То же в `PilotObjectDialog.SetField` для списка без поля ввода.
 
+## [0.4.0] - 2026-11-15
+
+### Изменено
+
+- Лицензия проекта изменена с MIT на Apache-2.0: обновлены файл `LICENSE` и поле `PackageLicenseExpression` в `Directory.Build.props`. Выпущенные версии 0.2.0 и 0.3.0 остаются под MIT; Apache-2.0 действует с версии 0.4.0.
+- Пункт меню «Run Tests» плагина-хоста учитывает фильтр `PILOTTESTHOST_FILTER`, как `pilottest`. Так можно выполнить один сценарий в уже работающем клиенте, например после смены пользователя без перезапуска.
+
+### Исправлено
+
+- `PilotNewSettingsItemWindow` находит окно правки строки «Управления общими настройками», когда клиент открывает его отдельным окном верхнего уровня без владельца. Раньше ожидание окна заканчивалось таймаутом.
+
 ## [0.3.0] - 2026-10-18
 
 ### Добавлено
@@ -72,6 +83,7 @@ PilotUITesting, UI-тесты снаружи клиента:
 - Тестовые сборки загружаются через `Assembly.LoadFrom` в домен клиента: после пересборки тестов клиент нужно перезапустить.
 - Список непроверенного вживую для UI-тестов ведётся в [docs/pilot-ui-testing.md](docs/pilot-ui-testing.md).
 
-[Не выпущено]: https://github.com/mahach666/PilotTestingTools/compare/v0.3.0...HEAD
-[0.3.0]: https://github.com/mahach666/PilotTestingTools/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/mahach666/PilotTestingTools/releases/tag/v0.2.0
+[Не выпущено]: https://github.com/PilotOpenTools/PilotTestingTools/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/PilotOpenTools/PilotTestingTools/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/PilotOpenTools/PilotTestingTools/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/PilotOpenTools/PilotTestingTools/releases/tag/v0.2.0
