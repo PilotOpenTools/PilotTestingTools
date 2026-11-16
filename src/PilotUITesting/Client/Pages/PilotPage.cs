@@ -186,7 +186,7 @@ namespace PilotUITesting.Client
             return UiChoice.Items(App, Single(combo, null), combo + " в «" + Description + "»");
         }
 
-        /// <summary>Выбрать в раскрывающемся списке пункт с точной подписью; возвращает подписи всех пунктов.</summary>
+        /// <summary>Выбрать в раскрывающемся списке пункт с точной подписью и свернуть список; возвращает подписи всех пунктов.</summary>
         public IReadOnlyList<string> Choose(By combo, string itemCaption)
         {
             return UiChoice.Choose(App, Single(combo, null), itemCaption, combo + " в «" + Description + "»");

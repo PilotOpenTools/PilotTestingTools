@@ -28,7 +28,8 @@ namespace PilotUITesting.Uia
         /// <summary>
         /// Раскрыть список (ExpandCollapse), найти пункт ListItem с точной подписью (под списком или во всплывающем окне), выбрать его:
         /// SelectionItem.Select, а если паттерна нет - кликом мыши. Если у списка есть ValuePattern - дождаться этого значения.
-        /// Возвращает подписи всех пунктов этого открытия.
+        /// Затем свернуть список, если он остался раскрытым: SelectionItem.Select всплывающее окно не закрывает, и следующий
+        /// щелчок мышью только закрыл бы его. Возвращает подписи всех пунктов этого открытия.
         /// </summary>
         internal static IReadOnlyList<string> Choose(PilotApp app, AutomationElement combo, string itemCaption, string description)
         {
@@ -53,15 +54,30 @@ namespace PilotUITesting.Uia
             {
                 UiAct.Click(found, $"выбрать «{itemCaption}» в {description}", MouseButton.Left, false);
             }
-            if (UiQuery.Read(() => combo.Patterns.Value.IsSupported, Wait.DefaultTimeout, "ValuePattern " + description))
+            bool hasValue = UiQuery.Read(() => combo.Patterns.Value.IsSupported, Wait.DefaultTimeout, "ValuePattern " + description);
+            WaitValue(combo, hasValue, itemCaption, description);
+            if (UiQuery.Read(() => expand.ExpandCollapseState.Value, Wait.DefaultTimeout, "раскрытие " + description) != ExpandCollapseState.Collapsed)
             {
-                string actual = "";
-                if (!Wait.TryUntil(() => (actual = combo.SafeValue()) == itemCaption, TimeSpan.FromSeconds(3)))
-                {
-                    throw new ValueNotAppliedException(description, itemCaption, actual);
-                }
+                UiAct.RunOnce(combo, "свернуть " + description, expand.Collapse, "Collapse");
+                Wait.Strict(() => UiQuery.Read(() => expand.ExpandCollapseState.Value, Wait.DefaultTimeout, "раскрытие " + description) == ExpandCollapseState.Collapsed,
+                    Wait.DefaultTimeout, description + " свёрнут", null);
+                // закрытие списка не должно отменить выбор
+                WaitValue(combo, hasValue, itemCaption, description);
             }
             return captions;
+        }
+
+        private static void WaitValue(AutomationElement combo, bool hasValue, string itemCaption, string description)
+        {
+            if (!hasValue)
+            {
+                return;
+            }
+            string actual = "";
+            if (!Wait.TryUntil(() => (actual = combo.SafeValue()) == itemCaption, TimeSpan.FromSeconds(3)))
+            {
+                throw new ValueNotAppliedException(description, itemCaption, actual);
+            }
         }
 
         /// <summary>Подписи пунктов списка: раскрыть, прочитать, свернуть (ExpandCollapse.Collapse) с проверкой свёрнутости.</summary>

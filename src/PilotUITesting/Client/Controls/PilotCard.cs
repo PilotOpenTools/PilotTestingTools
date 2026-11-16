@@ -94,7 +94,7 @@ namespace PilotUITesting.Client
             return this;
         }
 
-        /// <summary>Выбрать значение списка (ComboBox): раскрыть и выбрать пункт с точной подписью; если у поля есть Value - проверить его.</summary>
+        /// <summary>Выбрать значение списка (ComboBox): раскрыть, выбрать пункт с точной подписью и свернуть список; если у поля есть Value - проверить его.</summary>
         public PilotCard Choose(string attribute, string itemCaption)
         {
             AutomationElement field = Field(attribute);
