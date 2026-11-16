@@ -177,6 +177,45 @@ namespace PilotUITesting.Client
             }
         }
 
+        /// <summary>
+        /// Закрыть клиент из конфигурации, если он запущен в текущем сеансе Windows (exe с аргументом «-quit»), и дождаться завершения
+        /// процесса; не запущен - ничего. Не завершился - исключение (без Kill). Нужен перед записью сохранённого входа (<see cref="PilotClientLogin.Save"/>).
+        /// </summary>
+        public static void QuitRunning(PilotUiConfig config, TimeSpan? timeout = null)
+        {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+            using (Process running = FindRunning(config))
+            {
+                if (running == null)
+                {
+                    return;
+                }
+                TimeSpan limit = timeout ?? config.ClientStartTimeout;
+                PilotLog.Action("закрытие запущенного клиента: -quit");
+                RunClientCommand(config, "-quit", limit);
+                if (!running.WaitForExit((int)limit.TotalMilliseconds))
+                {
+                    throw new PilotWaitTimeoutException("завершение процесса клиента после «-quit» (открыто модальное окно?)", limit, limit, null, null);
+                }
+            }
+        }
+
+        /// <summary>Запущен ли клиент из конфигурации в текущем сеансе Windows.</summary>
+        public static bool IsRunning(PilotUiConfig config)
+        {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+            using (Process running = FindRunning(config))
+            {
+                return running != null;
+            }
+        }
+
         /// <summary>Закрыть клиент (<see cref="Quit"/>), запустить заново и дождаться готовности. Этот объект освобождается.</summary>
         public PilotApp Restart()
         {
@@ -205,12 +244,17 @@ namespace PilotUITesting.Client
 
         private void RunClientCommand(string argument, TimeSpan timeout)
         {
-            ProcessStartInfo info = new ProcessStartInfo(_config.ResolvedExePath, "\"" + argument + "\"") { UseShellExecute = false };
+            RunClientCommand(_config, argument, timeout);
+        }
+
+        private static void RunClientCommand(PilotUiConfig config, string argument, TimeSpan timeout)
+        {
+            ProcessStartInfo info = new ProcessStartInfo(config.ResolvedExePath, "\"" + argument + "\"") { UseShellExecute = false };
             using (Process second = Process.Start(info))
             {
                 if (second == null)
                 {
-                    throw new InvalidOperationException("Не удалось запустить " + _config.ResolvedExePath + " " + argument);
+                    throw new InvalidOperationException("Не удалось запустить " + config.ResolvedExePath + " " + argument);
                 }
                 if (!second.WaitForExit((int)timeout.TotalMilliseconds))
                 {

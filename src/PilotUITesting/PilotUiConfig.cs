@@ -29,12 +29,21 @@ namespace PilotUITesting
         Discard,
     }
 
-    /// <summary>Учётная запись базы Pilot (логин и пароль) - для подключения Server API под другим пользователем.</summary>
+    /// <summary>
+    /// Учётная запись базы Pilot (логин и пароль): для подключения Server API под другим пользователем (PilotUiTestBase.ServerAs)
+    /// и для клиента под другим пользователем (PilotUiTestBase.ClientAccount).
+    /// </summary>
     public sealed class PilotAccount
     {
         public string Login { get; set; }
 
         public string Password { get; set; }
+
+        /// <summary>
+        /// Подпись кнопки профиля клиента под этой учёткой («отображаемое имя (должность)»), как <see cref="PilotUiConfig.ClientUser"/>.
+        /// Сверяется, когда клиент запущен под этой учёткой (PilotUiTestBase.ClientAccount); пусто - не сверяется.
+        /// </summary>
+        public string ClientUser { get; set; }
     }
 
     /// <summary>

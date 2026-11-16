@@ -104,6 +104,20 @@ namespace PilotUITesting.Client
             return Find(GridId).FindDescendantsBfs(element => element.SafeControlType() == ControlType.DataItem, 6);
         }
 
+        /// <summary>
+        /// Строки конфигураций одной настройки: у строки AutomationId - ключ настройки, Name - оргединица, для которой она задана
+        /// [Д] дамп Pilot-BIM 26.20. При виртуализации - только построенные.
+        /// </summary>
+        public IReadOnlyList<AutomationElement> FeatureRows(string featureKey)
+        {
+            if (string.IsNullOrEmpty(featureKey))
+            {
+                throw new ArgumentException("Ключ настройки обязателен.", nameof(featureKey));
+            }
+
+            return Rows().Where(row => row.SafeAutomationId() == featureKey).ToList();
+        }
+
         /// <summary>Первая строка, в текстах которой есть подстрока; null - такой нет.</summary>
         public AutomationElement TryFindRow(string textPart)
         {

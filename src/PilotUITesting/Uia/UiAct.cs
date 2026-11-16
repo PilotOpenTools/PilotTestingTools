@@ -132,6 +132,17 @@ namespace PilotUITesting.Uia
             }
         }
 
+        /// <summary>Клик мышью в заданную точку экрана внутри элемента (например, в строку переносимой ссылки, а не в центр её прямоугольника).</summary>
+        internal static void ClickAt(AutomationElement element, Point point, string description)
+        {
+            string action = "клик по " + description;
+            ProcessDpi.RequireForMouse(action);
+            int pid = UiQuery.Read(() => element.Properties.ProcessId.ValueOrDefault, Wait.DefaultTimeout, "процесс " + description);
+            EnsurePointBelongsTo(point, pid, element, action);
+            PilotLog.Action(action + $" ({point.X},{point.Y})");
+            Mouse.Click(point, MouseButton.Left);
+        }
+
         /// <summary>Нажать клавиши (одновременно) с фокусом на элементе; фокус должен оказаться в окне процесса клиента.</summary>
         internal static void Keys(AutomationElement focusTarget, string description, params VirtualKeyShort[] keys)
         {

@@ -211,7 +211,7 @@ namespace PilotUITesting.Data
                 foreach (KeyValuePair<string, DValue> pair in expected)
                 {
                     obj.Attributes.TryGetValue(pair.Key, out DValue actual);
-                    if (pair.Value == null ? actual != null && actual.Value != null : !pair.Value.Equals(actual))
+                    if (!SameAsStored(pair.Value, actual))
                     {
                         return null;
                     }
@@ -330,6 +330,24 @@ namespace PilotUITesting.Data
                 return value.DateValue.Value.ToUniversalTime();
             }
             return value;
+        }
+
+        /// <summary>
+        /// Прочитанное с сервера значение совпадает с отправленным (<see cref="AsSent"/>). Пустой массив (int[] оргединиц, string[])
+        /// сервер хранит как отсутствие значения, поэтому он совпадает с null; expected null (атрибут убран) - тоже.
+        /// </summary>
+        internal static bool SameAsStored(DValue expected, DValue actual)
+        {
+            bool expectedEmpty = expected?.Value == null
+                                 || (expected.Value is int[] ints && ints.Length == 0)
+                                 || (expected.Value is string[] strings && strings.Length == 0);
+            if (expectedEmpty)
+            {
+                return actual?.Value == null
+                       || (actual.Value is int[] actualInts && actualInts.Length == 0)
+                       || (actual.Value is string[] actualStrings && actualStrings.Length == 0);
+            }
+            return expected.Equals(actual);
         }
 
         /// <summary>Значение атрибута строкой; атрибута нет - null (в отличие от <see cref="Attr"/>, который возвращает "").</summary>
